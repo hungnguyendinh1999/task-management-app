@@ -1,0 +1,127 @@
+{
+    "data": [
+        {
+            "id": 10,
+            "name": "Carol Smith",
+            "email": "carol@example.com",
+            "createdAt": "2026-03-26T04:18:05.082Z",
+            "assignedTasks": [
+                {
+                    "id": 41,
+                    "title": "Implement task list API",
+                    "description": "Support filters and pagination",
+                    "status": "IN_PROGRESS",
+                    "assignedUserId": 10,
+                    "createdByUserId": 11,
+                    "createdAt": "2026-03-26T04:18:05.102Z",
+                    "updatedAt": "2026-03-26T04:18:05.102Z",
+                    "deletedAt": null
+                },
+                {
+                    "id": 45,
+                    "title": "Implement edit form",
+                    "description": "Use full PUT update flow",
+                    "status": "TODO",
+                    "assignedUserId": 10,
+                    "createdByUserId": 12,
+                    "createdAt": "2026-03-26T04:18:05.102Z",
+                    "updatedAt": "2026-03-26T04:18:05.102Z",
+                    "deletedAt": null
+                },
+                {
+                    "id": 49,
+                    "title": "Prepare API documentation",
+                    "description": "Markdown or Postman collection",
+                    "status": "DONE",
+                    "assignedUserId": 10,
+                    "createdByUserId": 12,
+                    "createdAt": "2026-03-26T04:18:05.102Z",
+                    "updatedAt": "2026-03-26T04:18:05.102Z",
+                    "deletedAt": null
+                }
+            ]
+        },
+        {
+            "id": 11,
+            "name": "Bob Lee",
+            "email": "bob@example.com",
+            "createdAt": "2026-03-26T04:18:05.082Z",
+            "assignedTasks": [
+                {
+                    "id": 39,
+                    "title": "Design database schema",
+                    "description": "Finalize User and Task models",
+                    "status": "IN_PROGRESS",
+                    "assignedUserId": 11,
+                    "createdByUserId": 12,
+                    "createdAt": "2026-03-26T04:18:05.102Z",
+                    "updatedAt": "2026-03-26T04:18:05.102Z",
+                    "deletedAt": null
+                },
+                {
+                    "id": 43,
+                    "title": "Build login page",
+                    "description": "Frontend login form with validation",
+                    "status": "TODO",
+                    "assignedUserId": 11,
+                    "createdByUserId": 10,
+                    "createdAt": "2026-03-26T04:18:05.102Z",
+                    "updatedAt": "2026-03-26T04:18:05.102Z",
+                    "deletedAt": null
+                },
+                {
+                    "id": 46,
+                    "title": "Add loading states",
+                    "description": "Handle async API requests gracefully",
+                    "status": "DONE",
+                    "assignedUserId": 11,
+                    "createdByUserId": 12,
+                    "createdAt": "2026-03-26T04:18:05.102Z",
+                    "updatedAt": "2026-03-26T04:18:05.102Z",
+                    "deletedAt": null
+                }
+            ]
+        },
+        {
+            "id": 12,
+            "name": "Alice Johnson",
+            "email": "alice@example.com",
+            "createdAt": "2026-03-26T04:18:05.082Z",
+            "assignedTasks": [
+                {
+                    "id": 38,
+                    "title": "Set up backend project",
+                    "description": "Initialize Express, Prisma, and env config",
+                    "status": "TODO",
+                    "assignedUserId": 12,
+                    "createdByUserId": 12,
+                    "createdAt": "2026-03-26T04:18:05.102Z",
+                    "updatedAt": "2026-03-26T04:18:05.102Z",
+                    "deletedAt": null
+                },
+                {
+                    "id": 42,
+                    "title": "Add seed data",
+                    "description": null,
+                    "status": "DONE",
+                    "assignedUserId": 12,
+                    "createdByUserId": 11,
+                    "createdAt": "2026-03-26T04:18:05.102Z",
+                    "updatedAt": "2026-03-26T04:18:05.102Z",
+                    "deletedAt": null
+                },
+                {
+                    "id": 48,
+                    "title": "Write README",
+                    "description": "Document setup and architecture",
+                    "status": "IN_PROGRESS",
+                    "assignedUserId": 12,
+                    "createdByUserId": 10,
+                    "createdAt": "2026-03-26T04:18:05.102Z",
+                    "updatedAt": "2026-03-26T04:18:05.102Z",
+                    "deletedAt": null
+                }
+            ]
+        }
+    ]
+}
