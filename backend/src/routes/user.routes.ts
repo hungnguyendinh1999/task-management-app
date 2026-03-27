@@ -1,32 +1,11 @@
 import { Router } from "express";
-import { prisma } from "../lib/prisma.js";
+import { authMiddleware } from "../middleware/auth.middleware.js";
+import * as userController from "../controllers/user.controller.js";
 
 const router = Router();
 
-router.get("/", async (_req, res, next) => {
-  try {
-    const users = await prisma.user.findMany({
-      where: {
-        deletedAt: null,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        createdAt: true,
-        assignedTasks: true
-      },
-      orderBy: {
-        id: "asc",
-      },
-    });
+router.use(authMiddleware);
 
-    res.status(200).json({
-      data: users,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
+router.get("/", userController.listUsers);
 
 export default router;
