@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getUsers } from "../api/users";
-import { getTasks } from "../api/tasks";
+import {
+  createTask,
+  deleteTask,
+  getTasks,
+  updateTask,
+  type TaskFormPayload,
+} from "../api/tasks";
 import type { User } from "../types/user";
 import type { Task, TaskStatus, TasksPagination } from "../types/task";
+import TaskForm from "../components/TaskForm";
+
+type AssignedUserFilter = "" | number | "unassigned";
 
 type Filters = {
   status: "" | TaskStatus;
-  assignedUserId: "" | number;
+  assignedUserId: AssignedUserFilter;
 };
 
 export default function TasksPage() {
@@ -15,7 +24,12 @@ export default function TasksPage() {
 
   const [users, setUsers] = useState<User[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [loading, setLoading] = useState(true);
+//   const [loading, setLoading] = useState(true);
+//   const [submitting, setSubmitting] = useState(false);
+  const [loadingPage, setLoadingPage] = useState(true);
+  const [loadingTasks, setLoadingTasks] = useState(false);
+  const [submittingTask, setSubmittingTask] = useState(false);
+  const [deletingTaskId, setDeletingTaskId] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
 
   const [filters, setFilters] = useState<Filters>({
@@ -30,6 +44,9 @@ export default function TasksPage() {
     totalPages: 1,
   });
 
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+
   async function loadUsers() {
     const usersData = await getUsers();
     setUsers(usersData);
@@ -41,27 +58,32 @@ export default function TasksPage() {
       limit: pagination.limit,
       status: nextFilters.status || undefined,
       assignedUserId:
-        nextFilters.assignedUserId === "" ? undefined : nextFilters.assignedUserId,
+        nextFilters.assignedUserId === "" || nextFilters.assignedUserId === "unassigned"
+          ? undefined
+          : nextFilters.assignedUserId,
     });
+    let nextTasks = response.data;
 
-    setTasks(response.data);
+    if (nextFilters.assignedUserId === "unassigned") {
+      nextTasks = nextTasks.filter((t) => t.assignedUser === null);
+    }
+
+    nextTasks = [...nextTasks].sort((a, b) => a.id - b.id);
+
+    setTasks(nextTasks);
     setPagination(response.pagination);
   }
 
   async function loadPageData() {
-    setLoading(true);
+    setLoadingPage(true);
     setErrorMessage("");
 
     try {
       await Promise.all([loadUsers(), loadTasks(1, filters)]);
     } catch (error: any) {
-      if (error?.error?.message) {
-        setErrorMessage(error.error.message);
-      } else {
-        setErrorMessage("Failed to load tasks page");
-      }
+      setErrorMessage(error?.error?.message || "Failed to load tasks page");
     } finally {
-      setLoading(false);
+      setLoadingPage(false);
     }
   }
 
@@ -71,7 +93,7 @@ export default function TasksPage() {
   }, []);
 
   async function handleApplyFilters() {
-    setLoading(true);
+    setLoadingTasks(true);
     setErrorMessage("");
 
     try {
@@ -79,7 +101,7 @@ export default function TasksPage() {
     } catch (error: any) {
       setErrorMessage(error?.error?.message || "Failed to load tasks");
     } finally {
-      setLoading(false);
+      setLoadingTasks(false);
     }
   }
 
@@ -88,7 +110,7 @@ export default function TasksPage() {
       return;
     }
 
-    setLoading(true);
+    setLoadingTasks(true);
     setErrorMessage("");
 
     try {
@@ -96,52 +118,121 @@ export default function TasksPage() {
     } catch (error: any) {
       setErrorMessage(error?.error?.message || "Failed to load tasks");
     } finally {
-      setLoading(false);
+      setLoadingTasks(false);
+    }
+  }
+
+  function handleOpenCreateForm() {
+    setEditingTask(null);
+    setIsFormOpen(true);
+    setErrorMessage("");
+  }
+
+  function handleOpenEditForm(task: Task) {
+    setEditingTask(task);
+    setIsFormOpen(true);
+    setErrorMessage("");
+  }
+
+  function handleCancelForm() {
+    setEditingTask(null);
+    setIsFormOpen(false);
+    setErrorMessage("");
+  }
+
+  async function handleSubmitTask(payload: TaskFormPayload) {
+    setSubmittingTask(true);
+    setErrorMessage("");
+
+    try {
+      if (editingTask) {
+        await updateTask(editingTask.id, payload);
+      } else {
+        await createTask(payload);
+      }
+
+      setEditingTask(null);
+      setIsFormOpen(false);
+      await loadTasks(pagination.page, filters);
+    } catch (error: any) {
+      setErrorMessage(error?.error?.message || "Failed to save task");
+    } finally {
+      setSubmittingTask(false);
+    }
+  }
+
+  async function handleDeleteTask(taskId: number) {
+    const confirmed = window.confirm("Are you sure you want to delete this task?");
+    if (!confirmed) return;
+
+    setDeletingTaskId(taskId);
+    setErrorMessage("");
+
+    try {
+      await deleteTask(taskId);
+
+      if (tasks.length === 1 && pagination.page > 1) {
+        await loadTasks(pagination.page - 1, filters);
+      } else {
+        await loadTasks(pagination.page, filters);
+      }
+    } catch (error: any) {
+      setErrorMessage(error?.error?.message || "Failed to delete task");
+    } finally {
+      setDeletingTaskId(null);
     }
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-          gap: 12,
-          flexWrap: "wrap",
-        }}
-      >
+    <div className="min-h-screen bg-slate-950 text-slate-100 p-4 sm:p-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>
-          <h1 style={{ margin: 0 }}>Tasks</h1>
-          <p style={{ margin: "4px 0 0 0" }}>
+          <h1 className="text-3xl font-bold m-0">Tasks</h1>
+          <p className="text-sm text-slate-400 mt-1 m-0">
             Logged in as: {user?.name} ({user?.email})
           </p>
         </div>
 
-        <button onClick={logout}>Logout</button>
+        <button
+          onClick={logout}
+          className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded font-medium transition-colors disabled:opacity-50"
+        >
+          Logout
+        </button>
       </div>
 
-      <section
-        style={{
-          border: "1px solid #ddd",
-          padding: 12,
-          marginBottom: 16,
-        }}
-      >
-        <h2 style={{ marginTop: 0 }}>Filters</h2>
+      {/* Task Form Modal */}
+      {isFormOpen && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <TaskForm
+              users={users}
+              initialTask={editingTask}
+              submitting={submittingTask}
+              onSubmit={handleSubmitTask}
+              onCancel={handleCancelForm}
+            />
+          </div>
+        </div>
+      )}
 
-        <div
-          style={{
-            display: "flex",
-            gap: 12,
-            flexWrap: "wrap",
-            alignItems: "end",
-          }}
-        >
-          <div>
-            <label htmlFor="status-filter">Status</label>
-            <br />
+      {/* Error Message */}
+      {errorMessage && (
+        <div className="mb-6 p-4 bg-red-900/30 border border-red-600 text-red-200 rounded">
+          {errorMessage}
+        </div>
+      )}
+
+      {/* Filters */}
+      <section className="mb-6 p-4 border border-slate-600 rounded bg-slate-900/50">
+        <h2 className="text-xl font-bold mt-0 mb-4">Filters</h2>
+
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-end sm:gap-4 flex-wrap">
+          <div className="flex-1 min-w-[150px]">
+            <label htmlFor="status-filter" className="block text-sm font-medium mb-2">
+              Status
+            </label>
             <select
               id="status-filter"
               value={filters.status}
@@ -151,6 +242,7 @@ export default function TasksPage() {
                   status: e.target.value as "" | TaskStatus,
                 }))
               }
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 text-slate-100 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All</option>
               <option value="TODO">TODO</option>
@@ -159,20 +251,24 @@ export default function TasksPage() {
             </select>
           </div>
 
-          <div>
-            <label htmlFor="assigned-user-filter">Assigned User</label>
-            <br />
+          <div className="flex-1 min-w-[150px]">
+            <label htmlFor="assigned-user-filter" className="block text-sm font-medium mb-2">
+              Assigned User
+            </label>
             <select
               id="assigned-user-filter"
               value={filters.assignedUserId}
               onChange={(e) =>
                 setFilters((prev) => ({
                   ...prev,
-                  assignedUserId: e.target.value === "" ? "" : Number(e.target.value),
+                  assignedUserId: e.target.value === "" ? "" 
+                  : e.target.value === "unassigned" ? "unassigned" : Number(e.target.value),
                 }))
               }
+              className="w-full px-3 py-2 bg-slate-800 border border-slate-600 text-slate-100 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All</option>
+              <option value="unassigned">Unassigned</option>
               {users.map((u) => (
                 <option key={u.id} value={u.id}>
                   {u.name}
@@ -181,58 +277,99 @@ export default function TasksPage() {
             </select>
           </div>
 
-          <button onClick={handleApplyFilters} disabled={loading}>
-            Apply Filters
+          <button
+            onClick={handleApplyFilters}
+            disabled={loadingTasks || submittingTask}
+            className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded font-medium transition-colors disabled:opacity-50 w-full sm:w-auto"
+          >
+            {loadingTasks ? "Loading..." : "Apply Filters"}
           </button>
         </div>
       </section>
 
-      {errorMessage && (
-        <p style={{ color: "red", marginBottom: 16 }}>{errorMessage}</p>
-      )}
+      {/* Task List */}
+      <section className="p-4 border border-slate-600 rounded bg-slate-900/50">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
+          <h2 className="text-xl font-bold m-0">Task List</h2>
+          <button
+            onClick={handleOpenCreateForm}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded font-medium transition-colors disabled:opacity-50 w-full sm:w-auto"
+          >
+            + Add Task
+          </button>
+        </div>
 
-      <section
-        style={{
-          border: "1px solid #ddd",
-          padding: 12,
-        }}
-      >
-        <h2 style={{ marginTop: 0 }}>Task List</h2>
-
-        {loading ? (
-          <p>Loading...</p>
+        {loadingPage ? (
+          <p className="text-slate-400">Loading...</p>
+        ) : loadingTasks ? (
+          <p className="text-slate-400">Loading tasks...</p>
         ) : tasks.length === 0 ? (
-          <p>No tasks found.</p>
+          <p className="text-slate-400">No tasks found.</p>
         ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-              }}
-            >
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
               <thead>
-                <tr>
-                  <th style={cellStyle}>ID</th>
-                  <th style={cellStyle}>Title</th>
-                  <th style={cellStyle}>Description</th>
-                  <th style={cellStyle}>Status</th>
-                  <th style={cellStyle}>Assigned To</th>
-                  <th style={cellStyle}>Created By</th>
-                  <th style={cellStyle}>Updated At</th>
+                <tr className="border-b border-slate-600 bg-slate-800/50">
+                  <th className="text-left px-3 py-2 font-semibold text-sm">ID</th>
+                  <th className="text-left px-3 py-2 font-semibold text-sm">Title</th>
+                  <th className="text-left px-3 py-2 font-semibold text-sm hidden md:table-cell">Description</th>
+                  <th className="text-left px-3 py-2 font-semibold text-sm">Status</th>
+                  <th className="text-left px-3 py-2 font-semibold text-sm hidden sm:table-cell">Assigned To</th>
+                  <th className="text-left px-3 py-2 font-semibold text-sm hidden lg:table-cell">Created By</th>
+                  <th className="text-left px-3 py-2 font-semibold text-sm hidden lg:table-cell">Updated At</th>
+                  <th className="text-left px-3 py-2 font-semibold text-sm">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {tasks.map((task) => (
-                  <tr key={task.id}>
-                    <td style={cellStyle}>{task.id}</td>
-                    <td style={cellStyle}>{task.title}</td>
-                    <td style={cellStyle}>{task.description || "-"}</td>
-                    <td style={cellStyle}>{task.status}</td>
-                    <td style={cellStyle}>{task.assignedUser?.name || "Unassigned"}</td>
-                    <td style={cellStyle}>{task.createdByUser?.name || "-"}</td>
-                    <td style={cellStyle}>
+                  <tr
+                    key={task.id}
+                    className="border-b border-slate-700 hover:bg-slate-800/30 transition-colors"
+                  >
+                    <td className="px-3 py-3 text-sm">{task.id}</td>
+                    <td className="px-3 py-3 text-sm font-medium">{task.title}</td>
+                    <td className="px-3 py-3 text-sm text-slate-400 hidden md:table-cell max-w-xs truncate">
+                      {task.description || "-"}
+                    </td>
+                    <td className="px-3 py-3 text-sm">
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-semibold ${
+                          task.status === "DONE"
+                            ? "bg-green-900/50 text-green-200"
+                            : task.status === "IN_PROGRESS"
+                            ? "bg-blue-900/50 text-blue-200"
+                            : "bg-slate-700 text-slate-200"
+                        }`}
+                      >
+                        {task.status}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 text-sm hidden sm:table-cell text-slate-300">
+                      {task.assignedUser?.name || "Unassigned"}
+                    </td>
+                    <td className="px-3 py-3 text-sm text-slate-400 hidden lg:table-cell">
+                      {task.createdByUser?.name || "-"}
+                    </td>
+                    <td className="px-3 py-3 text-sm text-slate-400 hidden lg:table-cell text-xs">
                       {new Date(task.updatedAt).toLocaleString()}
+                    </td>
+                    <td className="px-3 py-3 text-sm">
+                      <div className="flex gap-2 flex-wrap">
+                        <button
+                          onClick={() => handleOpenEditForm(task)}
+                          disabled={deletingTaskId === task.id || deletingTaskId !== null}
+                          className="px-3 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-medium transition-colors disabled:opacity-50"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteTask(task.id)}
+                          disabled={deletingTaskId !== null && deletingTaskId !== task.id}
+                          className="px-3 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-xs font-medium transition-colors disabled:opacity-50"
+                        >
+                          {deletingTaskId === task.id ? "Deleting..." : "Delete"}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -241,43 +378,32 @@ export default function TasksPage() {
           </div>
         )}
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: 16,
-            gap: 12,
-            flexWrap: "wrap",
-          }}
-        >
-          <div>
-            Page {pagination.page} of {pagination.totalPages} | Total:{" "}
-            {pagination.total}
-          </div>
+        {/* Pagination */}
+        {!loadingPage && tasks.length > 0 && (
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mt-6 pt-4 border-t border-slate-700">
+            <div className="text-sm text-slate-400">
+              Page {pagination.page} of {pagination.totalPages} | Total: {pagination.total}
+            </div>
 
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              onClick={() => handlePageChange(pagination.page - 1)}
-              disabled={loading || pagination.page <= 1}
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => handlePageChange(pagination.page + 1)}
-              disabled={loading || pagination.page >= pagination.totalPages}
-            >
-              Next
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handlePageChange(pagination.page - 1)}
+                disabled={loadingTasks || submittingTask || pagination.page <= 1}
+                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded font-medium transition-colors disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => handlePageChange(pagination.page + 1)}
+                disabled={loadingTasks || submittingTask || pagination.page >= pagination.totalPages}
+                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded font-medium transition-colors disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </section>
     </div>
   );
 }
-
-const cellStyle: React.CSSProperties = {
-  border: "1px solid #ddd",
-  padding: "8px",
-  textAlign: "left",
-  verticalAlign: "top",
-};
