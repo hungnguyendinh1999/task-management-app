@@ -2,6 +2,9 @@
 
 A full-stack task management application with user authentication, task assignment, and status tracking.
 
+
+![Task List UI](docs/imgs/task-list.png)
+
 ## Features
 
 - Create, read, update, and delete tasks
@@ -66,7 +69,7 @@ Open `http://localhost:5173`.
 
 ## API Documentation and Testing (Postman)
 
-Use the exported Postman collection at [docs/Tama - Task Management App.postman_collection.json](docs/Tama%20-%20Task%20Management%20App.postman_collection.json).
+Use the exported Postman collection at [docs/postman/Tama - Task Management App.postman_collection.json](docs/postman/Tama%20-%20Task%20Management%20App.postman_collection.json).
 
 Import this collection into Postman, then set:
 

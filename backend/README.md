@@ -68,7 +68,7 @@ The server starts at `http://localhost:3001`.
 
 ## API Documentation and Testing (Postman)
 
-Postman collection: [Tama - Task Management App.postman_collection.json](../docs/Tama%20-%20Task%20Management%20App.postman_collection.json)
+Postman collection: [Tama - Task Management App.postman_collection.json](../docs/postman/Tama%20-%20Task%20Management%20App.postman_collection.json)
 
 In Postman, import the collection and configure:
 
@@ -113,6 +113,10 @@ Request -> helmet -> morgan -> cors -> json parser
        -> [auth middleware] -> controller -> service -> Prisma
        -> notFoundHandler / errorHandler
 ```
+
+## Database Relationship Diagram (Prisma ERD)
+
+![Prisma ERD](../docs/imgs/prisma-erd.svg)
 
 ---
 
