@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { prisma } from "../lib/prisma.js";
+import * as userService from "../services/user.service.js";
 
 export async function listUsers(
     _req: Request,
@@ -7,19 +7,7 @@ export async function listUsers(
     next: NextFunction,
 ): Promise<void> {
     try {
-        const users = await prisma.user.findMany({
-            where: {
-                deletedAt: null,
-            },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-            },
-            orderBy: {
-                id: "asc",
-            },
-        });
+        const users = await userService.listUsers();
 
         res.status(200).json({
             data: users,
@@ -27,5 +15,6 @@ export async function listUsers(
         return;
     } catch (error) {
         next(error);
+        return;
     }
 }
