@@ -1,0 +1,919 @@
+{
+	"info": {
+		"_postman_id": "826648c4-2279-426c-87bb-f9f92cade12b",
+		"name": "Tama - Task Management App",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "11875411"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const response = pm.response.json();",
+									"",
+									"let bearerToken = response.data.token; // Assuming the token is returned in the response",
+									"",
+									"pm.collectionVariables.set(\"bearerToken\", bearerToken);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"password123\"\n}"
+								},
+								"url": {
+									"raw": "http:///api/auth/login",
+									"protocol": "http",
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "309"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"135-Wyd5CKhsWqPztLiophfSq4j1oBs\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 27 Mar 2026 07:10:58 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"user\": {\n            \"id\": 12,\n            \"name\": \"Alice Johnson\",\n            \"email\": \"alice@example.com\",\n            \"createdAt\": \"2026-03-26T04:18:05.082Z\"\n        },\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEyLCJlbWFpbCI6ImFsaWNlQGV4YW1wbGUuY29tIiwiaWF0IjoxNzc0NTk1NDU4LCJleHAiOjE3NzQ2ODE4NTh9.ARr8UBm4g2svCo7JaAyKvemysLoYWL7dswCtwXTFC_4\"\n    }\n}"
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "List tasks (Pagination + Filters)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)  ",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Results per page (default: 10, max: 100)",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "TODO",
+									"description": "Filter by status: `TODO`, `IN_PROGRESS`, or `DONE`",
+									"disabled": true
+								},
+								{
+									"key": "assignedUserId",
+									"value": "2",
+									"description": "Filter by assigned user ID",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 List page 2",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http:///api/tasks?page=2",
+									"protocol": "http",
+									"path": [
+										"api",
+										"tasks"
+									],
+									"query": [
+										{
+											"key": "page",
+											"value": "2"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Resource-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Origin-Agent-Cluster",
+									"value": "?1"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-DNS-Prefetch-Control",
+									"value": "off"
+								},
+								{
+									"key": "X-Download-Options",
+									"value": "noopen"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "X-Permitted-Cross-Domain-Policies",
+									"value": "none"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "http://localhost:5173"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"name": "Content-Type",
+									"description": "",
+									"type": "text"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1971"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"7b3-ODS13btY7GI/RZPPCO2hUDtgVTo\""
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 28 Mar 2026 02:35:17 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"id\": 49,\n            \"title\": \"Prepare API documentation\",\n            \"description\": \"Markdown or Postman collection\",\n            \"status\": \"DONE\",\n            \"assignedUserId\": 10,\n            \"createdByUserId\": 12,\n            \"createdAt\": \"2026-03-26T04:18:05.102Z\",\n            \"updatedAt\": \"2026-03-26T04:18:05.102Z\",\n            \"deletedAt\": null,\n            \"assignedUser\": {\n                \"id\": 10,\n                \"name\": \"Carol Smith\",\n                \"email\": \"carol@example.com\"\n            },\n            \"createdByUser\": {\n                \"id\": 12,\n                \"name\": \"Alice Johnson\",\n                \"email\": \"alice@example.com\"\n            }\n        },\n        {\n            \"id\": 46,\n            \"title\": \"Add loading states\",\n            \"description\": \"Handle async API requests gracefully\",\n            \"status\": \"DONE\",\n            \"assignedUserId\": 11,\n            \"createdByUserId\": 12,\n            \"createdAt\": \"2026-03-26T04:18:05.102Z\",\n            \"updatedAt\": \"2026-03-26T04:18:05.102Z\",\n            \"deletedAt\": null,\n            \"assignedUser\": {\n                \"id\": 11,\n                \"name\": \"Bob Lee\",\n                \"email\": \"bob@example.com\"\n            },\n            \"createdByUser\": {\n                \"id\": 12,\n                \"name\": \"Alice Johnson\",\n                \"email\": \"alice@example.com\"\n            }\n        },\n        {\n            \"id\": 39,\n            \"title\": \"Design database schema\",\n            \"description\": \"Finalize User and Task models\",\n            \"status\": \"IN_PROGRESS\",\n            \"assignedUserId\": 11,\n            \"createdByUserId\": 12,\n            \"createdAt\": \"2026-03-26T04:18:05.102Z\",\n            \"updatedAt\": \"2026-03-26T04:18:05.102Z\",\n            \"deletedAt\": null,\n            \"assignedUser\": {\n                \"id\": 11,\n                \"name\": \"Bob Lee\",\n                \"email\": \"bob@example.com\"\n            },\n            \"createdByUser\": {\n                \"id\": 12,\n                \"name\": \"Alice Johnson\",\n                \"email\": \"alice@example.com\"\n            }\n        },\n        {\n            \"id\": 40,\n            \"title\": \"Write auth route\",\n            \"description\": \"Implement login with JWT\",\n            \"status\": \"TODO\",\n            \"assignedUserId\": null,\n            \"createdByUserId\": 12,\n            \"createdAt\": \"2026-03-26T04:18:05.102Z\",\n            \"updatedAt\": \"2026-03-26T04:18:05.102Z\",\n            \"deletedAt\": null,\n            \"assignedUser\": null,\n            \"createdByUser\": {\n                \"id\": 12,\n                \"name\": \"Alice Johnson\",\n                \"email\": \"alice@example.com\"\n            }\n        },\n        {\n            \"id\": 41,\n            \"title\": \"Implement task list API\",\n            \"description\": \"Support filters and pagination\",\n            \"status\": \"IN_PROGRESS\",\n            \"assignedUserId\": 10,\n            \"createdByUserId\": 11,\n            \"createdAt\": \"2026-03-26T04:18:05.102Z\",\n            \"updatedAt\": \"2026-03-26T04:18:05.102Z\",\n            \"deletedAt\": null,\n            \"assignedUser\": {\n                \"id\": 10,\n                \"name\": \"Carol Smith\",\n                \"email\": \"carol@example.com\"\n            },\n            \"createdByUser\": {\n                \"id\": 11,\n                \"name\": \"Bob Lee\",\n                \"email\": \"bob@example.com\"\n            }\n        }\n    ],\n    \"pagination\": {\n        \"page\": 2,\n        \"limit\": 10,\n        \"total\": 15,\n        \"totalPages\": 2\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Create new task",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Sample task\",\n    \"description\": \"No assignee yet. Auto-set status to TODO\",\n    \"assignedUserId\": null\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "404 Assignee ID not found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Create new feature\",\n    \"description\": \"Implement POST endpoint\",\n    \"status\": \"TODO\",\n    \"assignedUserId\": 1\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3001/api/tasks",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3001",
+									"path": [
+										"api",
+										"tasks"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "71"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"47-21GA1KKIOTPe6eXdipJUweByr7g\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 27 Mar 2026 01:18:44 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"error\": {\n        \"code\": \"USER_NOT_FOUND\",\n        \"message\": \"Assigned user not found\"\n    }\n}"
+						},
+						{
+							"name": "200 Success Task",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Sample task\",\n    \"description\": \"No assignee yet. Auto-set status to TODO\",\n    \"assignedUserId\": null\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:3001/api/tasks",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "3001",
+									"path": [
+										"api",
+										"tasks"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "X-Powered-By",
+									"value": "Express"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "294"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"126-1BOIGzjDLUZkh+mqyFl2rOyumoA\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 27 Mar 2026 01:21:16 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"id\": 51,\n        \"title\": \"Sample task\",\n        \"description\": \"No assignee yet. Auto-set status to TODO\",\n        \"status\": \"TODO\",\n        \"assignedUserId\": null,\n        \"createdByUserId\": null,\n        \"createdAt\": \"2026-03-27T01:21:16.482Z\",\n        \"updatedAt\": \"2026-03-27T01:21:16.482Z\",\n        \"deletedAt\": null,\n        \"assignedUser\": null,\n        \"createdByUser\": null\n    }\n}"
+						},
+						{
+							"name": "200 Success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Sample task\",\n    \"description\": \"No assignee yet. Auto-set status to TODO\",\n    \"assignedUserId\": null\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/tasks",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"tasks"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Resource-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Origin-Agent-Cluster",
+									"value": "?1"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-DNS-Prefetch-Control",
+									"value": "off"
+								},
+								{
+									"key": "X-Download-Options",
+									"value": "noopen"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "X-Permitted-Cross-Domain-Policies",
+									"value": "none"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "http://localhost:5173"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "348"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"15c-B1NXma9ilTSRE1ZVVaGqBZYRfPQ\""
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 28 Mar 2026 03:21:38 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"id\": 59,\n        \"title\": \"Sample task\",\n        \"description\": \"No assignee yet. Auto-set status to TODO\",\n        \"status\": \"TODO\",\n        \"assignedUserId\": null,\n        \"createdByUserId\": 12,\n        \"createdAt\": \"2026-03-28T03:21:38.788Z\",\n        \"updatedAt\": \"2026-03-28T03:21:38.788Z\",\n        \"deletedAt\": null,\n        \"assignedUser\": null,\n        \"createdByUser\": {\n            \"id\": 12,\n            \"name\": \"Alice Johnson\",\n            \"email\": \"alice@example.com\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update task",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Updated Title\",\n    \"description\": \"Updated description\",\n    \"status\": \"DONE\",\n    \"assignedUserId\": null\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "58",
+									"description": "task ID"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 Success",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"title\": \"Updated Title\",\n    \"description\": \"Updated description\",\n    \"status\": \"DONE\",\n    \"assignedUserId\": null\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http:///api/tasks/:id",
+									"protocol": "http",
+									"path": [
+										"api",
+										"tasks",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "58",
+											"description": "task ID"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Resource-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Origin-Agent-Cluster",
+									"value": "?1"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-DNS-Prefetch-Control",
+									"value": "off"
+								},
+								{
+									"key": "X-Download-Options",
+									"value": "noopen"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "X-Permitted-Cross-Domain-Policies",
+									"value": "none"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "http://localhost:5173"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "329"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"149-fL3BKWkZ6O26VxWk+lPe0J6w5o0\""
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 28 Mar 2026 02:53:34 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": {\n        \"id\": 58,\n        \"title\": \"Updated Title\",\n        \"description\": \"Updated description\",\n        \"status\": \"DONE\",\n        \"assignedUserId\": null,\n        \"createdByUserId\": 12,\n        \"createdAt\": \"2026-03-28T02:43:49.397Z\",\n        \"updatedAt\": \"2026-03-28T02:53:34.950Z\",\n        \"deletedAt\": null,\n        \"assignedUser\": null,\n        \"createdByUser\": {\n            \"id\": 12,\n            \"name\": \"Alice Johnson\",\n            \"email\": \"alice@example.com\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete task",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "",
+									"description": "task ID"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "All task endpoints require authentication.\n\n#### `GET /api/tasks` \n\nList tasks with optional filtering and pagination. Excluded deleted items.\n\n**Query parameters:**\n\n| Parameter        | Type   | Description                                        |\n| ---------------- | ------ | -------------------------------------------------- |\n| `page`           | number | Page number (default: 1)                           |\n| `limit`          | number | Results per page (default: 10, max: 100)           |\n| `status`         | string | Filter by status: `TODO`, `IN_PROGRESS`, or `DONE` |\n| `assignedUserId` | number | Filter by assigned user ID                         |"
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "List users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://{{baseUrl}}/api/users",
+							"protocol": "http",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http:///api/users",
+									"protocol": "http",
+									"path": [
+										"api",
+										"users"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": [
+								{
+									"key": "Content-Security-Policy",
+									"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+								},
+								{
+									"key": "Cross-Origin-Opener-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Cross-Origin-Resource-Policy",
+									"value": "same-origin"
+								},
+								{
+									"key": "Origin-Agent-Cluster",
+									"value": "?1"
+								},
+								{
+									"key": "Referrer-Policy",
+									"value": "no-referrer"
+								},
+								{
+									"key": "Strict-Transport-Security",
+									"value": "max-age=31536000; includeSubDomains"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff"
+								},
+								{
+									"key": "X-DNS-Prefetch-Control",
+									"value": "off"
+								},
+								{
+									"key": "X-Download-Options",
+									"value": "noopen"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN"
+								},
+								{
+									"key": "X-Permitted-Cross-Domain-Policies",
+									"value": "none"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "0"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "http://localhost:5173"
+								},
+								{
+									"key": "Vary",
+									"value": "Origin"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "183"
+								},
+								{
+									"key": "ETag",
+									"value": "W/\"b7-x1lcf/DTkY357/oPr1p4CSGp6nU\""
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 27 Mar 2026 23:46:06 GMT"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Keep-Alive",
+									"value": "timeout=5"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"data\": [\n        {\n            \"id\": 10,\n            \"name\": \"Carol Smith\",\n            \"email\": \"carol@example.com\"\n        },\n        {\n            \"id\": 11,\n            \"name\": \"Bob Lee\",\n            \"email\": \"bob@example.com\"\n        },\n        {\n            \"id\": 12,\n            \"name\": \"Alice Johnson\",\n            \"email\": \"alice@example.com\"\n        }\n    ]\n}"
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{bearerToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3001"
+		},
+		{
+			"key": "bearerToken",
+			"value": ""
+		}
+	]
+}

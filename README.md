@@ -1,51 +1,89 @@
 # Task Management App
 
-A simple task management app for tracking and assigning tasks.
+A full-stack task management application with user authentication, task assignment, and status tracking.
 
 ## Features
 
 - Create, read, update, and delete tasks
-- Mark tasks as TODO, IN PROGRESS, COMPLETE
-- Assign task to User
-- Organize tasks by priority and categories
-- Search and filter functionality
+- Mark tasks with status as `TODO`, `IN_PROGRESS`, or `DONE`
+- Assign tasks to users
+- Filter tasks by status or assigned user
+- JWT-based authentication
 
-## Installation
+## Tech Stack
+
+| Layer    | Technology                     |
+| -------- | ------------------------------ |
+| Frontend | React 19, TypeScript, Vite     |
+| Backend  | Node.js, Express 5, TypeScript |
+| Database | PostgreSQL 16                  |
+| ORM      | Prisma 6                       |
+| Auth     | JWT (jsonwebtoken), bcrypt     |
+
+## Ports
+
+| Service    | Default Port |
+| ---------- | ------------ |
+| Frontend   | 5173         |
+| Backend    | 3001         |
+| PostgreSQL | 5432         |
+
+## Getting Started
+
+### 1. Start the database
 
 ```bash
-git clone <repository-url>
-cd task-management-app
+docker run --name task-app-postgres \
+	-e POSTGRES_USER=postgres \
+	-e POSTGRES_PASSWORD=postgres \
+	-e POSTGRES_DB=task_app \
+	-p 5432:5432 \
+	-d postgres:16
+```
+
+### 2. Set up and start the backend
+
+```bash
+cd backend
 npm install
+# Create a .env file — see backend/README.md for required variables
+npm run prisma:migrate
+npm run prisma:seed
+npm run dev
 ```
 
-## Usage
+### 3. Set up and start the frontend
 
 ```bash
-npm start
+cd frontend
+npm install
+npm run dev
 ```
 
-## Project Structure
+Open `http://localhost:5173`.
 
-```
-backend/
-├── src/
-├── public/
-└── README.md
+> For full backend setup details (env variables, scripts, API reference), see [backend/README.md](backend/README.md).
 
-frontend/ (to be implemented)
-```
+## API Documentation and Testing (Postman)
 
-## Technologies
+Use the exported Postman collection at [docs/Tama - Task Management App.postman_collection.json](docs/Tama%20-%20Task%20Management%20App.postman_collection.json).
 
-- Node.js (Express)
-- React + Vite
-- Database: PostgreSQL (Docker)
-- ORM: Prisma
+Import this collection into Postman, then set:
 
-## Contributing
+- `baseUrl` = `http://localhost:3001`
+- `bearerToken` = token from `POST /api/auth/login`
 
-Contributions are welcome. Please create a feature branch and submit a pull request.
+## Auth Flow
 
-## License
+1. **Login** — `POST /api/auth/login` to receive a JWT token
+2. **Authenticated requests** — include `Authorization: Bearer <token>` header
 
-MIT
+## Seeded Test Accounts
+
+After running `npm run prisma:seed`, these accounts are available. You can use them to login:
+
+| Name          | Email                 | Password    |
+| ------------- | --------------------- | ----------- |
+| Alice Johnson | alice@example.com     | password123 |
+| Bob Lee       | bob@example.com       | password123 |
+| Carol Smith   | carol@example.com     | password123 |
