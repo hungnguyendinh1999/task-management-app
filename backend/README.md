@@ -116,7 +116,7 @@ Request -> helmet -> morgan -> cors -> json parser
 
 ## Database Relationship Diagram (Prisma ERD)
 
-![Prisma ERD](../docs/imgs/prisma-erd.svg)
+<img src="../docs/imgs/prisma-erd.svg" alt="Prisma ERD" width="240" />
 
 ---
 
